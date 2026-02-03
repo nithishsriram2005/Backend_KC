@@ -4,34 +4,35 @@ const path = require("path");
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
-
-/* ========= ✅ SERVE IMAGES (IMPORTANT) ========= */
+/* ================= CORS FIX ================= */
 app.use(
-  "/images",
-  express.static(path.join(__dirname, "images"))
+  cors({
+    origin: "*", // allow all (mobile + web + localhost)
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+  })
 );
 
-/* ========= TEST ROUTE ========= */
+/* ================= JSON ================= */
+app.use(express.json());
+
+/* ================= IMAGES ================= */
+app.use("/images", express.static(path.join(__dirname, "images")));
+
+/* ================= TEST ================= */
 app.get("/", (req, res) => {
   res.send("Backend Running ✅");
 });
 
-/* ========= ROUTES ========= */
+/* ================= ROUTES ================= */
 const db = require("./config/db");
 
-const authRoutes = require("./routes/authRoutes");
-const userRoutes = require("./routes/userRoutes");
-const productRoutes = require("./routes/productRoutes");
-const orderRoutes = require("./routes/orderRoutes");
+app.use(require("./routes/authRoutes")(db));
+app.use(require("./routes/userRoutes")(db));
+app.use(require("./routes/productRoutes")(db));
+app.use(require("./routes/orderRoutes")(db));
 
-app.use(authRoutes(db));
-app.use(userRoutes(db));
-app.use(productRoutes(db));
-app.use(orderRoutes(db));
-
-/* ========= IMPORTANT FOR RENDER/RAILWAY ========= */
+/* ================= SERVER ================= */
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
