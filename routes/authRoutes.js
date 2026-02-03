@@ -4,14 +4,12 @@ const authController = require("../controllers/authController");
 module.exports = (db) => {
   const router = express.Router();
 
-  /* ================= LOGIN ================= */
-
-  // for browser testing (GET)
+  // ✅ LOGIN (GET for browser testing)
   router.get("/login", (req, res) =>
     authController.login(req, res, db)
   );
 
-  // for app / flutter (POST)  ⭐ IMPORTANT
+  // ✅ LOGIN (POST for Flutter)
   router.post("/login", (req, res) =>
     authController.login(req, res, db)
   );
