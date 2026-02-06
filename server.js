@@ -1,40 +1,30 @@
+require('dotenv').config(); // load .env variables first
+
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
 const app = express();
-
-/* ================= CORS FIX ================= */
-app.use(
-  cors({
-    origin: "*", // allow all (mobile + web + localhost)
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type"],
-  })
-);
-
-/* ================= JSON ================= */
-app.use(express.json());
-
-/* ================= IMAGES ================= */
-app.use("/images", express.static(path.join(__dirname, "images")));
-
-/* ================= TEST ================= */
-app.get("/", (req, res) => {
-  res.send("Backend Running ✅");
-});
-
-/* ================= ROUTES ================= */
 const db = require("./config/db");
 
-app.use(require("./routes/authRoutes")(db));
-app.use(require("./routes/userRoutes")(db));
-app.use(require("./routes/productRoutes")(db));
-app.use(require("./routes/orderRoutes")(db));
+app.use(cors());
+app.use(express.json());
+
+/* ================= IMAGES STATIC ================= */
+app.use("/images", express.static("images"));
+
+/* ================= ROUTES ================= */
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+const productRoutes = require("./routes/productRoutes");
+const orderRoutes = require("./routes/orderRoutes");
+
+app.use(authRoutes(db));
+app.use(userRoutes(db));
+app.use(productRoutes(db));
+app.use(orderRoutes(db));
 
 /* ================= SERVER ================= */
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log(`🚀 Server running on port ${process.env.PORT}`);
 });
